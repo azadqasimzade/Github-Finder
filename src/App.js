@@ -120,7 +120,7 @@ export class App extends Component {
           <Route path={'/user/:login'} render={(routeProps) =>{
             return (
               <>  
-                <UserDetails {...routeProps} getUser={this.getUser} user={this.state.user}/>
+                <UserDetails {...routeProps} getUser={this.getUser} user={this.state.user} loading={this.state.loading}/>
               </>
             )
           }}/>
