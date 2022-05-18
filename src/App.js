@@ -90,7 +90,9 @@ export class App extends Component {
 
   clearButton(){
     this.setState({
-      users: []
+      users: [],
+      user: {},
+      repos: []
     })
   }
 
