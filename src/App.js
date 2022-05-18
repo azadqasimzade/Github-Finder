@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Navbar from './Components/Navbar/Navbar'
 import Users from './Components/Users/Users'
 import axios from 'axios'
 import Search from './Components/Search/Search';
 import Alert from './Components/Alert/Alert';
+import UserDetails from './Components/UserDetails/UserDetails'
 
 export class App extends Component {
   constructor(props){
@@ -13,10 +15,12 @@ export class App extends Component {
     this.clearButton = this.clearButton.bind(this);
     this.setAlert = this.setAlert.bind(this);
     this.clearAlert = this.clearAlert.bind(this);
+    this.getUser = this.getUser.bind(this);
 
     this.state={
       loading:false,
       users:[],
+      user:{},
       alert: null
     }
   
@@ -54,6 +58,20 @@ export class App extends Component {
     })
   }
 
+  getUser(username){
+    this.setState({
+      loading: true
+    })
+
+    axios.get(`https://api.github.com/users/${username}`)
+      .then(res =>{
+        this.setState({
+          user: res.data,
+          loading: false
+      })
+    })
+  }
+
   clearButton(){
     this.setState({
       users: []
@@ -81,16 +99,33 @@ export class App extends Component {
   render() {
     return (
       <>
+      <Router>
         <Navbar/>
-        <Alert 
-          alert={this.state.alert}
-          clearAlert={this.clearAlert}/>
-        <Search 
-          searchInput={this.searchInput}
-          clearButton={this.clearButton} 
-          showClearBtn={this.state.users.length>0 ? true : false}
-          setAlert={this.setAlert}/>
-        <Users users={this.state.users} loading={this.state.loading}/>
+        <Switch>
+          <Route exact path={'/'} render={(routeProps =>{
+            return(
+              <>
+                  <Alert 
+                    alert={this.state.alert}
+                    clearAlert={this.clearAlert}/>
+                  <Search 
+                    searchInput={this.searchInput}
+                    clearButton={this.clearButton} 
+                    showClearBtn={this.state.users.length>0 ? true : false}
+                    setAlert={this.setAlert}/>
+                  <Users users={this.state.users} loading={this.state.loading} user={this.state.user}/>
+              </>
+            )
+          })}/>
+          <Route path={'/user/:login'} render={(routeProps) =>{
+            return (
+              <>  
+                <UserDetails {...routeProps} getUser={this.getUser} user={this.state.user}/>
+              </>
+            )
+          }}/>
+        </Switch>
+      </Router>
       </>
     )
   }

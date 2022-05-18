@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export default function Navbar() {
   return (
@@ -6,7 +7,7 @@ export default function Navbar() {
         <nav className='navbar navbar-dark bg-primary'>
             <div className="container">
                 <div className="row">
-                    <a href="/" className='navbar-brand' rel="noreferrer">Github Finder <i className='bi bi-github'></i></a>
+                    <Link to="/" className='navbar-brand' rel="noreferrer">Github Finder <i className='bi bi-github'></i></Link>
                 </div>
             </div>
         </nav>    
