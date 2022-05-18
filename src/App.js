@@ -16,11 +16,13 @@ export class App extends Component {
     this.setAlert = this.setAlert.bind(this);
     this.clearAlert = this.clearAlert.bind(this);
     this.getUser = this.getUser.bind(this);
+    this.getUserRepos = this.getUserRepos.bind(this);
 
     this.state={
       loading:false,
       users:[],
       user:{},
+      repos: [],
       alert: null
     }
   
@@ -67,6 +69,20 @@ export class App extends Component {
       .then(res =>{
         this.setState({
           user: res.data,
+          loading: false
+      })
+    })
+  }
+
+  getUserRepos(username){
+    this.setState({
+      loading: true
+    })
+
+    axios.get(`https://api.github.com/users/${username}/repos`)
+      .then(res =>{
+        this.setState({
+          repos: res.data,
           loading: false
       })
     })
@@ -120,7 +136,14 @@ export class App extends Component {
           <Route path={'/user/:login'} render={(routeProps) =>{
             return (
               <>  
-                <UserDetails {...routeProps} getUser={this.getUser} user={this.state.user} loading={this.state.loading}/>
+                <UserDetails 
+                  {...routeProps}
+                  getUser={this.getUser} 
+                  user={this.state.user} 
+                  loading={this.state.loading}
+                  getUserRepos={this.getUserRepos}
+                  repos={this.state.repos}
+                  />
               </>
             )
           }}/>
