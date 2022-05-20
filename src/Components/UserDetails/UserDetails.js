@@ -57,9 +57,6 @@ export class UserDetails extends Component {
                                 )
                             }
 
-                                <ul className='list-group'>
-                                    
-                                </ul>
                              </div>
                              {
                                  repos.length > 0 && (
