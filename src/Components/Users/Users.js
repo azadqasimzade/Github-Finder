@@ -1,26 +1,27 @@
-import React, { Component } from 'react'
+import React, { useContext } from 'react'
 import Loading from '../Loading/Loading'
 import User from '../User/User'
+import GithubContext from '../Context/Github/githubContext'
 
-export class Users extends Component {
-  render() {
-    if(this.props.loading){
-      return <Loading/>
-    }else{
-      return (
-        <>
-          <div className="container">
-            <div className="row">
-              {
-                this.props.users.map(user =>(
-                  <User key={user.id} user={user}/>
-                ))
-              }
-            </div>
+const Users =() =>{
+  const {users,loading} = useContext(GithubContext)
+
+  if(loading){
+    return <Loading/>
+  }else{
+    return (
+      <>
+        <div className="container">
+          <div className="row">
+            {
+              users.map(user =>(
+                <User key={user.id} user={user}/>
+              ))
+            }
           </div>
-        </>
-      )
-    }
+        </div>
+      </>
+    )
   }
 }
 
