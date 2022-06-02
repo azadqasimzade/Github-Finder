@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {useEffect, useState } from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import Navbar from './Components/Navbar/Navbar'
 import Users from './Components/Users/Users'
@@ -7,114 +7,73 @@ import Search from './Components/Search/Search';
 import Alert from './Components/Alert/Alert';
 import UserDetails from './Components/UserDetails/UserDetails'
 
-export class App extends Component {
-  constructor(props){
-    super(props);
+const App =()=> {
+  const [users, setUsers] = useState([])
+  const [user, setUser] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [repos, setRepos] = useState([])
+  const [alert, setAlert] = useState(null)
 
-    this.searchInput = this.searchInput.bind(this);
-    this.clearButton = this.clearButton.bind(this);
-    this.setAlert = this.setAlert.bind(this);
-    this.clearAlert = this.clearAlert.bind(this);
-    this.getUser = this.getUser.bind(this);
-    this.getUserRepos = this.getUserRepos.bind(this);
-
-    this.state={
-      loading:false,
-      users:[],
-      user:{},
-      repos: [],
-      alert: null
-    }
-  
-  }
-
-  componentDidMount(){
-    const json = localStorage.getItem('github');
-    const users = JSON.parse(json);
+  useEffect(() =>{
+    const users = JSON.parse(localStorage.getItem('github'))
 
     if(users){
-      this.setState({
-        users: users
-      })
+      setUsers(users)
     }
-  }
+  }, [])
 
-  componentDidUpdate(prevState){
-    if(prevState.users !== this.state.users){
-      const json = JSON.stringify(this.state.users);
-      localStorage.setItem('github',json)
-    }
-  }
+  useEffect(() =>{
+    localStorage.setItem('github',JSON.stringify(users))
+  }, [users])
 
-  searchInput(keyword){
-    this.setState({
-        loading: true
-      })
+  const searchInput =(keyword) =>{
+    setLoading(true)
     
     axios.get(`https://api.github.com/search/users?q=${keyword}`)
       .then(res =>{
-        this.setState({
-          users: res.data.items,
-          loading: false
-      })
+        setUsers(res.data.items)
+        setLoading(false)
     })
   }
 
-  getUser(username){
-    this.setState({
-      loading: true
-    })
+  const getUser =(username) =>{
+    setLoading(true)
 
     axios.get(`https://api.github.com/users/${username}`)
       .then(res =>{
-        this.setState({
-          user: res.data,
-          loading: false
-      })
+        setUser(res.data)
+        setLoading(false)
     })
   }
 
-  getUserRepos(username){
-    this.setState({
-      loading: true
-    })
+  const getUserRepos = (username) =>{
+    setLoading(true)
 
     axios.get(`https://api.github.com/users/${username}/repos`)
       .then(res =>{
-        this.setState({
-          repos: res.data,
-          loading: false
-      })
+        setRepos(res.data)
+        setLoading(false)
     })
   }
 
-  clearButton(){
-    this.setState({
-      users: [],
-      user: {},
-      repos: []
-    })
+  const clearButton =() =>{
+    setUsers([])
+    setUser({})
+    setRepos([])
   }
 
-  setAlert(msg,type){
-    this.setState({
-      alert: {msg, type}
-    })
+  const showAlert =(msg,type) =>{
+    setAlert({msg, type})
 
     setTimeout(() => {
-      this.setState({
-        alert: null
-      })
+      setAlert(null)
     }, 2000);
   }
 
-  clearAlert(){
-    this.setState({
-      alert: null
-    })
+  const clearAlert =() =>{
+    setAlert(null)
   }
 
-  render() {
     return (
       <>
       <Router>
@@ -124,14 +83,14 @@ export class App extends Component {
             return(
               <>
                   <Alert 
-                    alert={this.state.alert}
-                    clearAlert={this.clearAlert}/>
+                    alert={alert}
+                    clearAlert={clearAlert}/>
                   <Search 
-                    searchInput={this.searchInput}
-                    clearButton={this.clearButton} 
-                    showClearBtn={this.state.users.length>0 ? true : false}
-                    setAlert={this.setAlert}/>
-                  <Users users={this.state.users} loading={this.state.loading} user={this.state.user}/>
+                    searchInput={searchInput}
+                    clearButton={clearButton} 
+                    showClearBtn={users.length>0 ? true : false}
+                    setAlert={showAlert}/>
+                  <Users users={users} loading={loading} user={user}/>
               </>
             )
           })}/>
@@ -140,11 +99,11 @@ export class App extends Component {
               <>  
                 <UserDetails 
                   {...routeProps}
-                  getUser={this.getUser} 
-                  user={this.state.user} 
-                  loading={this.state.loading}
-                  getUserRepos={this.getUserRepos}
-                  repos={this.state.repos}
+                  getUser={getUser} 
+                  user={user} 
+                  loading={loading}
+                  getUserRepos={getUserRepos}
+                  repos={repos}
                   />
               </>
             )
@@ -153,7 +112,6 @@ export class App extends Component {
       </Router>
       </>
     )
-  }
 }
 
 export default App
